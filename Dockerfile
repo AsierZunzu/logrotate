@@ -1,4 +1,4 @@
-FROM blacklabelops/alpine:3.8
+FROM alpine:3.24
 LABEL maintainer="Asier Zunzunegui"
 
 # logrotate version (e.g. 3.9.1-r0)
@@ -16,7 +16,9 @@ RUN export CONTAINER_USER=logrotate && \
       tar \
       gzip \
       wget \
-      tzdata && \
+      tzdata \
+      bash \
+      tini && \
     if  [ "${LOGROTATE_VERSION}" = "latest" ]; \
       then apk add logrotate ; \
       else apk add "logrotate=${LOGROTATE_VERSION}" ; \
