@@ -72,12 +72,21 @@ logrotate_cron_timetable="/usr/sbin/logrotate ${logrotate_parameters} --state=${
 # ----- Cron Start ------
 
 if [ "$1" = 'cron' ]; then
-  if [ ${logrotate_autoupdate} = "true" ]; then
-    exec /usr/bin/go-cron "${logrotate_croninterval}" /bin/bash -c "/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
-    exit
+  # supercronic reads 6 fields as "min hour dom month dow year", while go-cron
+  # style schedules use "sec min hour dom month dow": append a year field so
+  # existing LOGROTATE_CRONSCHEDULE values keep their meaning.
+  read -ra cron_fields <<< "${logrotate_croninterval}"
+  if [[ ${logrotate_croninterval} != @* ]] && [ ${#cron_fields[@]} -eq 6 ]; then
+    logrotate_croninterval="${logrotate_croninterval} *"
   fi
 
-  exec /usr/bin/go-cron "${logrotate_croninterval}" /bin/bash -c "${logrotate_cron_timetable}"
+  logrotate_cron_command="${logrotate_cron_timetable}"
+  if [ ${logrotate_autoupdate} = "true" ]; then
+    logrotate_cron_command="/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
+  fi
+
+  echo "${logrotate_croninterval} /bin/bash -c \"${logrotate_cron_command}\"" > /usr/bin/logrotate.d/crontab
+  exec /usr/bin/supercronic /usr/bin/logrotate.d/crontab
 fi
 
 #-----------------------

@@ -234,7 +234,7 @@ $ docker run -d \
   blacklabelops/logrotate
 ~~~~
 
-> This will logrotate on go-cron schedule \* \* \* \* \* \* (every second).
+> This will logrotate on the cron schedule \* \* \* \* \* \* (every second).
 
 ## Log and View the Logrotate Output
 

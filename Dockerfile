@@ -13,20 +13,16 @@ RUN addgroup -g $CONTAINER_GID logrotate && \
     apk add --update \
       tar \
       gzip \
-      wget \
       tzdata \
       bash \
-      tini && \
+      tini \
+      supercronic && \
     if  [ "${LOGROTATE_VERSION}" = "latest" ]; \
       then apk add logrotate ; \
       else apk add "logrotate=${LOGROTATE_VERSION}" ; \
     fi && \
     mkdir -p /usr/bin/logrotate.d && \
-    wget --no-check-certificate -O /tmp/go-cron.tar.gz https://github.com/michaloo/go-cron/releases/download/v0.0.2/go-cron.tar.gz && \
-    tar xvf /tmp/go-cron.tar.gz -C /usr/bin && \
-    apk del \
-      wget && \
-    rm -rf /var/cache/apk/* && rm -rf /tmp/*
+    rm -rf /var/cache/apk/*
 
 # environment variable for this container
 ENV LOGROTATE_OLDDIR= \
