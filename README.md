@@ -1,8 +1,5 @@
 # Dockerized Logrotate
 
-[![Open Issues](https://img.shields.io/github/issues/blacklabelops/logrotate.svg)](https://github.com/blacklabelops/logrotate/issues) [![Stars on GitHub](https://img.shields.io/github/stars/blacklabelops/logrotate.svg)](https://github.com/blacklabelops/logrotate/stargazers)
-[![Docker Stars](https://img.shields.io/docker/stars/blacklabelops/logrotate.svg)](https://hub.docker.com/r/blacklabelops/logrotate/) [![Docker Pulls](https://img.shields.io/docker/pulls/blacklabelops/logrotate.svg)](https://hub.docker.com/r/blacklabelops/logrotate/) [![](https://badge.imagelayers.io/blacklabelops/logrotate:latest.svg)](https://imagelayers.io/?images=blacklabelops/logrotate:latest 'Get your own badge on imagelayers.io')
-
 This container can crawl for logfiles and rotate them. It is a side-car container
 for containers that write logfiles and need a log rotation mechanism. Just hook up some containers and define your
 backup volumes.
@@ -278,7 +275,6 @@ $ docker run -d \
   -v $(pwd)/logs:/logs \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_PARAMETERS=vdf" \
-  -e "LOG_FILE=/logs/cron.log" \
   blacklabelops/logrotate
 ~~~~
 
@@ -300,26 +296,6 @@ $ docker run -d \
 ~~~~
 
 > Writes the latest status file each logrotation. Reads status files at each start.
-
-## Log and View the Cron Output
-
-You can specify a separate logfile for cron. The file
-is specified using the environment variable `LOG_FILE`. Must be a full path!
-
-Example:
-
-~~~~
-$ docker run -d \
-  -v /var/lib/docker/containers:/var/lib/docker/containers \
-  -v /var/log/docker:/var/log/docker \
-  -v $(pwd)/logs:/logs \
-  -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
-  -e "LOGROTATE_INTERVAL=hourly" \
-  -e "LOG_FILE=/logs/cron.log" \
-  blacklabelops/logrotate
-~~~~
-
-> You will be able to see cron output every minute in file logs/cron.log.
 
 ## Setting a Date Extension
 

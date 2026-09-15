@@ -8,9 +8,7 @@ ARG CONTAINER_UID=1000
 ARG CONTAINER_GID=1000
 
 # install dev tools
-RUN export CONTAINER_USER=logrotate && \
-    export CONTAINER_GROUP=logrotate && \
-    addgroup -g $CONTAINER_GID logrotate && \
+RUN addgroup -g $CONTAINER_GID logrotate && \
     adduser -u $CONTAINER_UID -G logrotate -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
     apk add --update \
       tar \
@@ -41,8 +39,7 @@ ENV LOGROTATE_OLDDIR= \
     LOGROTATE_LOGFILE= \
     LOGROTATE_CRONSCHEDULE= \
     LOGROTATE_PARAMETERS= \
-    LOGROTATE_STATUSFILE= \
-    LOG_FILE=
+    LOGROTATE_STATUSFILE=
 
 COPY docker-entrypoint.sh /usr/bin/logrotate.d/docker-entrypoint.sh
 COPY update-logrotate.sh /usr/bin/logrotate.d/update-logrotate.sh
