@@ -96,7 +96,7 @@ logrotate_autoupdate=true
 
 function resolveLogrotateAutoupdate() {
   if [ -n "${LOGROTATE_AUTOUPDATE}" ]; then
-    logrotate_autoupdate="$(echo ${LOGROTATE_AUTOUPDATE,,})"
+    logrotate_autoupdate="${LOGROTATE_AUTOUPDATE,,}"
   fi
 }
 
