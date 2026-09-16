@@ -18,7 +18,7 @@ function createLogrotateConfigurationEntry() {
   local conf_prerotate="${13}"
   local conf_postrotate="${14}"
   local new_log=
-  new_log=${file}" {"
+  new_log="\"${file}\" {"
   if [ "$file_user" != "UNKNOWN" ] && [ "$file_owner" != "UNKNOWN" ]; then
     new_log=${new_log}"\n  su ${file_user} ${file_owner}"
   fi
@@ -59,7 +59,7 @@ function createLogrotateConfigurationEntry() {
     new_log=${new_log}"\n  endscript"
   fi
   new_log=${new_log}"\n}"
-  echo -e $new_log
+  echo -e "$new_log"
 }
 
 function insertConfigurationEntry()

@@ -4,8 +4,8 @@
 
 function handleSingleFile() {
   local singleFile="$1"
-  local file_owner_user=$(stat -c %U ${singleFile})
-  local file_owner_group=$(stat -c %G ${singleFile})
+  local file_owner_user=$(stat -c %U "${singleFile}")
+  local file_owner_group=$(stat -c %G "${singleFile}")
   local new_logrotate_entry=$(createLogrotateConfigurationEntry "${singleFile}" "${file_owner_user}" "${file_owner_group}" "${logrotate_copies}" "${logrotate_logfile_compression}" "${logrotate_logfile_compression_delay}" "${logrotate_mode}" "${logrotate_interval}" "${logrotate_size}" "${logrotate_dateformat}" "${logrotate_minsize}" "${logrotate_maxage}" "${logrotate_prerotate}" "${logrotate_postrotate}")
   echo "Inserting new ${singleFile} to /usr/bin/logrotate.d/logrotate.conf"
   insertConfigurationEntry "$new_logrotate_entry" "/usr/bin/logrotate.d/logrotate.conf"
@@ -47,16 +47,20 @@ if [ -n "${LOGS_FILE_REGEX}" ]; then
   find_name_args+=(-regex "${LOGS_FILE_REGEX}")
 fi
 
+# Group the name patterns so -type f and -print0 apply to all of them.
+find_filter=()
+if [ ${#find_name_args[@]} -gt 0 ]; then
+  find_filter=(\( "${find_name_args[@]}" \))
+fi
+
+# Read NUL-separated results so file names containing spaces stay intact.
 for d in ${log_dirs}
 do
-  log_files=$(find ${d} -type f "${find_name_args[@]}") || continue
-  for f in ${log_files};
+  while IFS= read -r -d '' f
   do
-    if [ -f "${f}" ]; then
-      echo "Found new file $f, Processing..."
-      handleSingleFile "$f"
-    fi
-  done
+    echo "Found new file $f, Processing..."
+    handleSingleFile "$f"
+  done < <(find "${d}" -type f "${find_filter[@]}" -print0)
 done
 
 # ----- Take all Log in Subfolders ------
@@ -69,14 +73,11 @@ fi
 
 for d in ${all_log_dirs}
 do
-  log_files=$(find ${d} -type f);
-  for f in ${log_files};
+  while IFS= read -r -d '' f
   do
-    if [ -f "${f}" ]; then
-      echo "Found new file $f, Processing..."
-      handleSingleFile "$f"
-    fi
-  done
+    echo "Found new file $f, Processing..."
+    handleSingleFile "$f"
+  done < <(find "${d}" -type f -print0)
 done
 
 cat /usr/bin/logrotate.d/logrotate.conf
