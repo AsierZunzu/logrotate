@@ -58,7 +58,8 @@ COPY logrotateCreateConf.sh /usr/bin/logrotate.d/logrotateCreateConf.sh
 # Healthy while supercronic runs, or while the entrypoint is still waiting on DELAYED_START.
 # Patterns are anchored to the full command line: tini's arguments also contain the
 # entrypoint path, and busybox pgrep -x compares against argv[0] including its directory.
-HEALTHCHECK --interval=1m --timeout=5s \
+# The first check runs one interval after start, so check every 5s during the start period.
+HEALTHCHECK --interval=1m --timeout=5s --start-period=1m --start-interval=5s \
   CMD pgrep -f '^/usr/bin/supercronic ' >/dev/null || pgrep -f '^/bin/bash /usr/bin/logrotate.d/docker-entrypoint.sh' >/dev/null || exit 1
 
 ENTRYPOINT ["/sbin/tini","--","/usr/bin/logrotate.d/docker-entrypoint.sh"]
