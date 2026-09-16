@@ -21,6 +21,10 @@ function createLogrotateConfigurationEntry() {
   new_log="\"${file}\" {"
   if [ "$file_user" != "UNKNOWN" ] && [ "$file_owner" != "UNKNOWN" ]; then
     new_log=${new_log}"\n  su ${file_user} ${file_owner}"
+  else
+    # logrotate only accepts names in su, and without it skips logs whose
+    # directory is group or world writable.
+    new_log=${new_log}"\n  su root root"
   fi
   new_log=${new_log}"\n  rotate ${conf_copies}"
   new_log=${new_log}"\n  missingok"
