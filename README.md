@@ -347,20 +347,27 @@ $ docker run -d \
 
 ## Logrotate Status File
 
-Logrotate must remember when files have been rotated when using time intervals, e.g. 'daily'. The status file will be written by default to the container volume but you can specify a custom location with the environment variable LOGROTATE_STATUSFILE.
+Logrotate must remember when files have been rotated when using time intervals, e.g. `daily`. The status file is
+written to `/logrotate-status/logrotate.status` by default. You can specify a custom location with the environment
+variable `LOGROTATE_STATUSFILE`.
+
+`/logrotate-status` is declared as a volume, but without a mount Docker creates a new anonymous volume for every
+container. Recreating the container then loses the status file and logrotate no longer knows when files were last
+rotated. Mount a named volume or a host directory to keep it.
 
 Example:
 
 ~~~~
 $ docker run -d \
+  -v /var/log:/var/log \
+  -v logrotate-status:/logrotate-status \
+  -e "ALL_LOGS_DIRECTORIES=/var/log" \
   -e "LOGROTATE_INTERVAL=hourly" \
   -e "LOGROTATE_STATUSFILE=/logrotate-status/logrotate.status" \
-  -e "ALL_LOGS_DIRECTORIES=/var/log" \
-  -e "LOGROTATE_PARAMETERS=vf" \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
-> Writes the latest status file each logrotation. Reads status files at each start.
+> Keeps the status file in the named volume logrotate-status, so it survives container upgrades and restarts.
 
 ## Setting a Date Extension
 
