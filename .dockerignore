@@ -3,6 +3,7 @@
 .gitignore
 .dockerignore
 .idea
+.shellcheckrc
 .vagrant
 LICENSE
 README.md

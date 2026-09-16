@@ -1,0 +1,4 @@
+# The scripts source each other at runtime from /usr/bin/logrotate.d/, so
+# shellcheck cannot follow them and reports the shared variables as unused
+# or unassigned when each file is checked on its own.
+disable=SC1091,SC2034,SC2154
