@@ -17,53 +17,39 @@ function createLogrotateConfigurationEntry() {
   local conf_maxage="${12}"
   local conf_prerotate="${13}"
   local conf_postrotate="${14}"
-  local new_log=
+  local nl=$'\n'
+  local new_log
+  # Escape backslashes and double quotes so the name survives logrotate's quoting.
+  file=${file//\\/\\\\}
+  file=${file//\"/\\\"}
   new_log="\"${file}\" {"
   if [ "$file_user" != "UNKNOWN" ] && [ "$file_owner" != "UNKNOWN" ]; then
-    new_log=${new_log}"\n  su ${file_user} ${file_owner}"
+    new_log+="${nl}  su ${file_user} ${file_owner}"
   else
     # logrotate only accepts names in su, and without it skips logs whose
     # directory is group or world writable.
-    new_log=${new_log}"\n  su root root"
+    new_log+="${nl}  su root root"
   fi
-  new_log=${new_log}"\n  rotate ${conf_copies}"
-  new_log=${new_log}"\n  missingok"
-  if [ -n "${conf_logfile_compression}" ]; then
-    new_log=${new_log}"\n  ${conf_logfile_compression}"
-  fi
-  if [ -n "${conf_logfile_compression_delay}" ]; then
-    new_log=${new_log}"\n  ${conf_logfile_compression_delay}"
-  fi
-  if [ -n "${conf_logrotate_mode}" ]; then
-    new_log=${new_log}"\n  ${conf_logrotate_mode}"
-  fi
-  if [ -n "${conf_logrotate_interval}" ]; then
-    new_log=${new_log}"\n  ${conf_logrotate_interval}"
-  fi
-  if [ -n "${conf_logrotate_size}" ]; then
-    new_log=${new_log}"\n  ${conf_logrotate_size}"
-  fi
-  if [ -n "${conf_minsize}" ]; then
-    new_log=${new_log}"\n  ${conf_minsize}"
-  fi
-  if [ -n "${conf_maxage}" ]; then
-    new_log=${new_log}"\n  ${conf_maxage}"
-  fi
+  new_log+="${nl}  rotate ${conf_copies}"
+  new_log+="${nl}  missingok"
+  local directive
+  for directive in "${conf_logfile_compression}" "${conf_logfile_compression_delay}" "${conf_logrotate_mode}" "${conf_logrotate_interval}" "${conf_logrotate_size}" "${conf_minsize}" "${conf_maxage}"; do
+    if [ -n "${directive}" ]; then
+      new_log+="${nl}  ${directive}"
+    fi
+  done
   if [ -n "${conf_dateformat}" ]; then
-    new_log=${new_log}"\n  dateext\n  dateformat ${conf_dateformat}"
+    new_log+="${nl}  dateext${nl}  dateformat ${conf_dateformat}"
   fi
   if [ -n "${conf_prerotate}" ]; then
-    new_log=${new_log}"\n  prerotate"
-    new_log=${new_log}"\n\t${conf_prerotate}"
-    new_log=${new_log}"\n  endscript"
+    new_log+="${nl}  prerotate${nl}    ${conf_prerotate}${nl}  endscript"
   fi
   if [ -n "${conf_postrotate}" ]; then
-    new_log=${new_log}"\n  postrotate"
-    new_log=${new_log}"\n\t${conf_postrotate}"
-    new_log=${new_log}"\n  endscript"
+    new_log+="${nl}  postrotate${nl}    ${conf_postrotate}${nl}  endscript"
   fi
-  new_log=${new_log}"\n}"
-  echo -e "$new_log"
+  new_log+="${nl}}"
+  # printf instead of echo -e: backslashes in names and commands stay literal.
+  printf '%s\n' "${new_log}"
 }
 
 function insertConfigurationEntry()

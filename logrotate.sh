@@ -31,17 +31,11 @@ function resolveOldDir() {
   fi
 }
 
-syslogger_command=""
+syslogger_args=()
 
-function resolveSysloggerCommand() {
-  local syslogger_tag=""
-
+function resolveSysloggerArgs() {
   if [ -n "${SYSLOGGER_TAG}" ]; then
-    syslogger_tag=" -t "${SYSLOGGER_TAG}
-  fi
-
-  if [ -n "${SYSLOGGER}" ]; then
-    syslogger_command="logger "${syslogger_tag}
+    syslogger_args=(-t "${SYSLOGGER_TAG}")
   fi
 }
 
@@ -106,7 +100,7 @@ logrotate_postrotate=${LOGROTATE_POSTROTATE_COMMAND:-""}
 
 logrotate_dateformat=${LOGROTATE_DATEFORMAT:-""}
 
-resolveSysloggerCommand
+resolveSysloggerArgs
 resolveOldDir
 resolveLogrotateMode
 resolveLogfileCompression

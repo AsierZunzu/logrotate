@@ -42,6 +42,7 @@ ENV LOGROTATE_OLDDIR= \
 
 COPY docker-entrypoint.sh /usr/bin/logrotate.d/docker-entrypoint.sh
 COPY update-logrotate.sh /usr/bin/logrotate.d/update-logrotate.sh
+COPY run-logrotate.sh /usr/bin/logrotate.d/run-logrotate.sh
 COPY logrotate.sh /usr/bin/logrotate.d/logrotate.sh
 COPY logrotateConf.sh /usr/bin/logrotate.d/logrotateConf.sh
 COPY logrotateCreateConf.sh /usr/bin/logrotate.d/logrotateCreateConf.sh
