@@ -4,9 +4,11 @@
 
 function handleSingleFile() {
   local singleFile="$1"
-  local file_owner_user=$(stat -c %U "${singleFile}")
-  local file_owner_group=$(stat -c %G "${singleFile}")
-  local new_logrotate_entry=$(createLogrotateConfigurationEntry "${singleFile}" "${file_owner_user}" "${file_owner_group}" "${logrotate_copies}" "${logrotate_logfile_compression}" "${logrotate_logfile_compression_delay}" "${logrotate_mode}" "${logrotate_interval}" "${logrotate_size}" "${logrotate_dateformat}" "${logrotate_minsize}" "${logrotate_maxage}" "${logrotate_prerotate}" "${logrotate_postrotate}")
+  local file_owner_user file_owner_group new_logrotate_entry
+  # Skip files that disappear between discovery and stat instead of aborting under set -e.
+  file_owner_user=$(stat -c %U "${singleFile}") || return 0
+  file_owner_group=$(stat -c %G "${singleFile}") || return 0
+  new_logrotate_entry=$(createLogrotateConfigurationEntry "${singleFile}" "${file_owner_user}" "${file_owner_group}" "${logrotate_copies}" "${logrotate_logfile_compression}" "${logrotate_logfile_compression_delay}" "${logrotate_mode}" "${logrotate_interval}" "${logrotate_size}" "${logrotate_dateformat}" "${logrotate_minsize}" "${logrotate_maxage}" "${logrotate_prerotate}" "${logrotate_postrotate}")
   echo "Inserting new ${singleFile} to /usr/bin/logrotate.d/logrotate.conf"
   insertConfigurationEntry "$new_logrotate_entry" "/usr/bin/logrotate.d/logrotate.conf"
 }
