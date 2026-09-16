@@ -10,7 +10,7 @@ ARG CONTAINER_GID=1000
 # install dev tools
 RUN addgroup -g $CONTAINER_GID logrotate && \
     adduser -u $CONTAINER_UID -G logrotate -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
-    apk add --update \
+    apk add --no-cache \
       tar \
       gzip \
       tzdata \
@@ -18,11 +18,10 @@ RUN addgroup -g $CONTAINER_GID logrotate && \
       tini \
       supercronic && \
     if  [ "${LOGROTATE_VERSION}" = "latest" ]; \
-      then apk add logrotate ; \
-      else apk add "logrotate=${LOGROTATE_VERSION}" ; \
+      then apk add --no-cache logrotate ; \
+      else apk add --no-cache "logrotate=${LOGROTATE_VERSION}" ; \
     fi && \
-    mkdir -p /usr/bin/logrotate.d && \
-    rm -rf /var/cache/apk/*
+    mkdir -p /usr/bin/logrotate.d
 
 # environment variable for this container
 ENV LOGROTATE_OLDDIR= \
