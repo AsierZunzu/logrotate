@@ -1,8 +1,12 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: logrotate
 spec:
+  selector:
+    matchLabels:
+      app: logging
+      id: logrotate
   template:
     metadata:
       labels:
@@ -12,7 +16,7 @@ spec:
     spec:
       containers:
       - name: logrotate-es
-        image: blacklabelops/logrotate
+        image: ghcr.io/asierzunzu/logrotate:latest
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
