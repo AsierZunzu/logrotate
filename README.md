@@ -507,17 +507,6 @@ $ docker run -d \
 
 > This will logrotate in Australia/Melbourne time zone.
 
-## Used in Kubernetes
-
-When we run container in Kubernetes, we can use the logrotate container to rotate the logs. As we create
-
-An DaemonSet in cluster ,we can deploy an logrotate container in every nodes of the cluster.
-
-```sh
-# kubectl create -f logrotate_ds.yaml
-daemonset "logrotate" created
-```
-
 ## References
 
 * [Logrotate](https://github.com/logrotate/logrotate)
