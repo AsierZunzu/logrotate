@@ -21,18 +21,32 @@ RUN apk add --no-cache \
     mkdir -p /logrotate-status && \
     chmod 1777 /logrotate-status
 
-# environment variable for this container
-ENV LOGROTATE_OLDDIR= \
-    LOGROTATE_COMPRESSION= \
-    LOGROTATE_INTERVAL= \
-    LOGROTATE_COPIES= \
-    LOGROTATE_SIZE= \
-    LOGS_DIRECTORIES= \
-    LOG_FILE_ENDINGS= \
-    LOGROTATE_LOGFILE= \
-    LOGROTATE_CRONSCHEDULE= \
-    LOGROTATE_PARAMETERS= \
-    LOGROTATE_STATUSFILE=
+# Settings read by the scripts, empty when not set. See README.md for each one.
+ENV LOGS_DIRECTORIES="" \
+    ALL_LOGS_DIRECTORIES="" \
+    LOG_FILE_ENDINGS="" \
+    LOGS_FILE_REGEX="" \
+    LOGROTATE_INTERVAL="" \
+    LOGROTATE_COPIES="" \
+    LOGROTATE_SIZE="" \
+    LOGROTATE_MINSIZE="" \
+    LOGROTATE_MAXAGE="" \
+    LOGROTATE_COMPRESSION="" \
+    LOGROTATE_DELAYCOMPRESS="" \
+    LOGROTATE_MODE="" \
+    LOGROTATE_OLDDIR="" \
+    LOGROTATE_DATEFORMAT="" \
+    LOGROTATE_PREROTATE_COMMAND="" \
+    LOGROTATE_POSTROTATE_COMMAND="" \
+    LOGROTATE_CRONSCHEDULE="" \
+    LOGROTATE_AUTOUPDATE="" \
+    LOGROTATE_PARAMETERS="" \
+    LOGROTATE_STATUSFILE="" \
+    LOGROTATE_LOGFILE="" \
+    SYSLOGGER="" \
+    SYSLOGGER_TAG="" \
+    DELAYED_START="" \
+    DEBUG=""
 
 COPY docker-entrypoint.sh /usr/bin/logrotate.d/docker-entrypoint.sh
 COPY update-logrotate.sh /usr/bin/logrotate.d/update-logrotate.sh
