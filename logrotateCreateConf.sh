@@ -6,6 +6,29 @@
 # run when a file appears twice, which happens with nested or repeated directories.
 declare -A configured_files=()
 
+# Suffixes logrotate appends to rotated copies: a counter (.1) or a date
+# extension (-20260916, .2026-09-16), optionally followed by a compression extension.
+readonly rotated_suffix_regex='^[-._][0-9][-._0-9]*(\.(gz|bz2|xz|zst|lz4|Z))?$'
+
+# A file is a rotated copy when stripping such a suffix leaves the path of an existing file.
+function isRotatedCopy() {
+  local file="$1"
+  local i
+  for (( i=${#file}-1; i>0; i-- )); do
+    case "${file:i:1}" in
+      -|.|_)
+        if [[ ${file:i} =~ ${rotated_suffix_regex} ]] && [ -f "${file:0:i}" ]; then
+          return 0
+        fi
+      ;;
+      /)
+        return 1
+      ;;
+    esac
+  done
+  return 1
+}
+
 function handleSingleFile() {
   local singleFile="$1"
   local file_owner_user file_owner_group new_logrotate_entry resolved_file
@@ -14,6 +37,9 @@ function handleSingleFile() {
     return 0
   fi
   configured_files[${resolved_file}]=1
+  if isRotatedCopy "${singleFile}"; then
+    return 0
+  fi
   # Skip files that disappear between discovery and stat instead of aborting under set -e.
   file_owner_user=$(stat -c %U "${singleFile}") || return 0
   file_owner_group=$(stat -c %G "${singleFile}") || return 0
@@ -58,6 +84,12 @@ if [ ${#find_name_args[@]} -gt 0 ]; then
   find_filter=(\( "${find_name_args[@]}" \))
 fi
 
+# Never crawl an absolute olddir: it only holds rotated copies.
+find_prune=()
+if [[ ${LOGROTATE_OLDDIR} == /* ]]; then
+  find_prune=(-path "${LOGROTATE_OLDDIR%/}" -prune -o)
+fi
+
 # Read NUL-separated results so file names containing spaces stay intact.
 for d in ${log_dirs}
 do
@@ -65,7 +97,7 @@ do
   do
     echo "Found new file $f, Processing..."
     handleSingleFile "$f"
-  done < <(find "${d}" -type f "${find_filter[@]}" -print0)
+  done < <(find "${d}" "${find_prune[@]}" -type f "${find_filter[@]}" -print0)
 done
 
 # ----- Take all Log in Subfolders ------
@@ -82,7 +114,7 @@ do
   do
     echo "Found new file $f, Processing..."
     handleSingleFile "$f"
-  done < <(find "${d}" -type f -print0)
+  done < <(find "${d}" "${find_prune[@]}" -type f -print0)
 done
 
 cat /usr/bin/logrotate.d/logrotate.conf
