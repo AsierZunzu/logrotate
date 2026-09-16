@@ -1,5 +1,9 @@
 FROM alpine:3.24
-LABEL maintainer="Asier Zunzunegui"
+LABEL org.opencontainers.image.title="logrotate" \
+      org.opencontainers.image.description="Side-car container that crawls for log files and rotates them with logrotate" \
+      org.opencontainers.image.authors="Asier Zunzunegui" \
+      org.opencontainers.image.source="https://github.com/AsierZunzu/logrotate" \
+      org.opencontainers.image.licenses="MIT"
 
 # logrotate version (e.g. 3.9.1-r0)
 ARG LOGROTATE_VERSION=latest
