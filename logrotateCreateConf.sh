@@ -15,13 +15,7 @@ function handleSingleFile() {
 
 # ----- Logfile Crawling ------
 
-log_dirs=""
-
-if [ -n "${LOGS_DIRECTORIES}" ]; then
-  log_dirs=${LOGS_DIRECTORIES}
-else
-  log_dirs=${log_dir}
-fi
+log_dirs=${LOGS_DIRECTORIES}
 
 logs_ending="log"
 
