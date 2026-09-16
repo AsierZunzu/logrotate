@@ -108,6 +108,59 @@ logrotate_postrotate=${LOGROTATE_POSTROTATE_COMMAND:-""}
 
 logrotate_dateformat=${LOGROTATE_DATEFORMAT:-""}
 
+# Checks the environment once at startup. Invalid values abort with every error
+# listed; settings that are merely suspicious only print a warning.
+function validateConfiguration() {
+  local errors=0
+  local d
+
+  if [ -n "${LOGROTATE_INTERVAL}" ] && [[ ! ${LOGROTATE_INTERVAL} =~ ^(hourly|daily|weekly|monthly|yearly)$ ]]; then
+    echo "Error: LOGROTATE_INTERVAL must be hourly, daily, weekly, monthly or yearly, got '${LOGROTATE_INTERVAL}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${LOGROTATE_COMPRESSION}" ] && [[ ! ${LOGROTATE_COMPRESSION} =~ ^(compress|nocompress)$ ]]; then
+    echo "Error: LOGROTATE_COMPRESSION must be compress or nocompress, got '${LOGROTATE_COMPRESSION}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${LOGROTATE_COPIES}" ] && [[ ! ${LOGROTATE_COPIES} =~ ^[0-9]+$ ]]; then
+    echo "Error: LOGROTATE_COPIES must be a number, got '${LOGROTATE_COPIES}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${LOGROTATE_MAXAGE}" ] && [[ ! ${LOGROTATE_MAXAGE} =~ ^[0-9]+$ ]]; then
+    echo "Error: LOGROTATE_MAXAGE must be a number of days, got '${LOGROTATE_MAXAGE}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${LOGROTATE_SIZE}" ] && [[ ! ${LOGROTATE_SIZE} =~ ^[0-9]+[kMG]?$ ]]; then
+    echo "Error: LOGROTATE_SIZE must be a size like 100, 100k, 100M or 100G, got '${LOGROTATE_SIZE}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${LOGROTATE_MINSIZE}" ] && [[ ! ${LOGROTATE_MINSIZE} =~ ^[0-9]+[kMG]?$ ]]; then
+    echo "Error: LOGROTATE_MINSIZE must be a size like 100, 100k, 100M or 100G, got '${LOGROTATE_MINSIZE}'" >&2
+    errors=$((errors + 1))
+  fi
+  if [ -n "${DELAYED_START}" ] && [[ ! ${DELAYED_START} =~ ^[0-9]+[smhd]?$ ]]; then
+    echo "Error: DELAYED_START must be a number of seconds, optionally with an s, m, h or d suffix, got '${DELAYED_START}'" >&2
+    errors=$((errors + 1))
+  fi
+
+  if [ -n "${LOGROTATE_AUTOUPDATE}" ] && [[ ! ${LOGROTATE_AUTOUPDATE,,} =~ ^(true|false)$ ]]; then
+    echo "Warning: LOGROTATE_AUTOUPDATE is '${LOGROTATE_AUTOUPDATE}', which disables auto update; use true or false" >&2
+  fi
+  if [ -z "${LOGS_DIRECTORIES}${ALL_LOGS_DIRECTORIES}" ]; then
+    echo "Warning: neither LOGS_DIRECTORIES nor ALL_LOGS_DIRECTORIES is set, no logs will be rotated" >&2
+  fi
+  # Unquoted on purpose: directories are whitespace separated.
+  for d in ${LOGS_DIRECTORIES} ${ALL_LOGS_DIRECTORIES}; do
+    if [ ! -d "${d}" ]; then
+      echo "Warning: log directory ${d} does not exist" >&2
+    fi
+  done
+
+  if [ "${errors}" -gt 0 ]; then
+    return 1
+  fi
+}
+
 resolveSysloggerArgs
 resolveOldDir
 resolveLogrotateMode

@@ -9,6 +9,11 @@ set -e
 source /usr/bin/logrotate.d/logrotate.sh
 source /usr/bin/logrotate.d/logrotateConf.sh
 
+if ! validateConfiguration; then
+  echo "Invalid configuration, exiting" >&2
+  exit 1
+fi
+
 resetConfigurationFile
 
 if [ -n "${DELAYED_START}" ]; then
@@ -41,9 +46,6 @@ if [ -n "${LOGROTATE_INTERVAL}" ]; then
     yearly)
       logrotate_croninterval='@yearly'
     ;;
-    *)
-      logrotate_croninterval="1 0 0 * * *"
-    ;;
   esac
 fi
 
@@ -63,6 +65,10 @@ if [ "$1" = 'cron' ]; then
   fi
 
   echo "${logrotate_croninterval} /usr/bin/logrotate.d/run-logrotate.sh" > "${logrotate_crontab_file}"
+  if ! /usr/bin/supercronic -test "${logrotate_crontab_file}"; then
+    echo "Invalid cron schedule '${logrotate_croninterval}', check LOGROTATE_CRONSCHEDULE" >&2
+    exit 1
+  fi
   exec /usr/bin/supercronic "${logrotate_crontab_file}"
 fi
 
