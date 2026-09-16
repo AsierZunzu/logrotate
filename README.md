@@ -8,7 +8,7 @@ backup volumes.
 
 | Distribution | Version      | Tag          | Dockerfile |
 |--------------|--------------|--------------|------------|
-| Logrotate Alpine | latest, 1.3 | latest, 1.3 | [Dockerfile](https://github.com/blacklabelops/logrotate/blob/master/Dockerfile) |
+| Logrotate Alpine | 3.24 | `latest`, `master`, `<version>`, `sha-<commit>` | [Dockerfile](https://github.com/AsierZunzu/logrotate/blob/master/Dockerfile) |
 
 ## Make It Short
 
@@ -19,7 +19,7 @@ $ docker run -d \
   -v /var/lib/docker/containers:/var/lib/docker/containers \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will rotate all your Docker logfiles on a daily basis up to 5 times.
@@ -32,7 +32,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_INTERVAL=hourly" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will put logrotate on an hourly schedule.
@@ -57,7 +57,7 @@ $ docker run -d \
   -v /var/lib/docker/containers:/var/lib/docker/containers \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will logrotate any logfile(s) under /var/lib/docker/containers, /var/log/docker (or subdirectories of them).
@@ -75,7 +75,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOG_FILE_ENDINGS=json xml" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Crawls for file endings .json and .xml.
@@ -100,7 +100,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_INTERVAL=hourly" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will logrotate logfile(s) on hourly basis.
@@ -118,7 +118,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_COPIES=10" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Will create 10 daily logs before deleting old logs.
@@ -140,7 +140,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_SIZE=10M" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will logrotate when logfile(s) reaches 10M+.
@@ -158,7 +158,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_COMPRESSION=compress" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will compress the logrotated logs.
@@ -176,7 +176,7 @@ $ docker run -d \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_COMPRESSION=compress" \
   -e "LOGROTATE_DELAYCOMPRESS=false" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will compress all logrotated logs, including the most recent one.
@@ -194,7 +194,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_MODE=create 0644"
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will rename the current log file, and create a new one in its place
@@ -213,7 +213,7 @@ $ docker run -d \
   -v $(pwd)/logs:/logs/ \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_OLDDIR=/logs" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Will move old logfiles in the local directory logs/.
@@ -231,7 +231,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_CRONSCHEDULE=* * * * * *" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will logrotate on the cron schedule \* \* \* \* \* \* (every second).
@@ -251,7 +251,7 @@ $ docker run -d \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_INTERVAL=hourly" \
   -e "LOGROTATE_LOGFILE=/logs/logrotatecron.log" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > You will be able to see logrotate output every minute in file logs/logrotatecron.log.
@@ -275,7 +275,7 @@ $ docker run -d \
   -v $(pwd)/logs:/logs \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_PARAMETERS=vdf" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Will run logrotate with: /usr/bin/logrotate -dvf
@@ -292,7 +292,7 @@ $ docker run -d \
   -e "LOGROTATE_STATUSFILE=/logrotate-status/logrotate.status" \
   -e "ALL_LOGS_DIRECTORIES=/var/log" \
   -e "LOGROTATE_PARAMETERS=vf" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Writes the latest status file each logrotation. Reads status files at each start.
@@ -312,7 +312,7 @@ $ docker run -d \
   -e "LOGROTATE_INTERVAL=daily" \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_DATEFORMAT=-%Y%m%d" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will set logrotate to split files and name them by date format -%Y%m%d.
@@ -339,7 +339,7 @@ $ docker run -d \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_MAXAGE=60" \
   -e "LOGROTATE_MINSIZE=100k" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Maxage is sixty days and minsize is 100 kilobytes.
@@ -358,7 +358,7 @@ $ docker run -d \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_PREROTATE_COMMAND=/usr/bin/yourscript.sh" \
   -e "LOGROTATE_POSTROTATE_COMMAND=/usr/bin/killall -HUP httpd" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > Will print messages before and after rotation.
@@ -377,7 +377,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "LOGROTATE_AUTOUPDATE=false" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will disable logrotate configuration file update (when logrotate action is triggering).
@@ -396,7 +396,7 @@ $ docker run -d \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
   -e "TZ=Australia/Melbourne" \
-  blacklabelops/logrotate
+  ghcr.io/asierzunzu/logrotate
 ~~~~
 
 > This will logrotate in Australia/Melbourne time zone.
