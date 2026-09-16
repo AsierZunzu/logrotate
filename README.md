@@ -369,6 +369,40 @@ $ docker run -d \
 
 > Keeps the status file in the named volume logrotate-status, so it survives container upgrades and restarts.
 
+## Run Hardened
+
+The container only writes its generated configuration to `/tmp/logrotate`, the status file and the rotated logs, so
+it can run with a read-only root filesystem.
+
+It runs as root by default so it can rotate logs owned by any user. Drop every capability logrotate does not need:
+
+~~~~
+$ docker run -d \
+  --read-only --tmpfs /tmp \
+  --security-opt no-new-privileges \
+  --cap-drop ALL \
+  --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add SETUID --cap-add SETGID \
+  -v /var/log/myapp:/var/log/myapp \
+  -v logrotate-status:/logrotate-status \
+  -e "LOGS_DIRECTORIES=/var/log/myapp" \
+  ghcr.io/asierzunzu/logrotate
+~~~~
+
+When all logs belong to the same user, run as that user instead. The `su` directive is then left out and logrotate
+rotates the files with the container user's permissions:
+
+~~~~
+$ docker run -d \
+  --read-only --tmpfs /tmp \
+  --security-opt no-new-privileges \
+  --cap-drop ALL \
+  --user 1000:1000 \
+  -v /var/log/myapp:/var/log/myapp \
+  -v logrotate-status:/logrotate-status \
+  -e "LOGS_DIRECTORIES=/var/log/myapp" \
+  ghcr.io/asierzunzu/logrotate
+~~~~
+
 ## Setting a Date Extension
 
 With Logrotate it is possible to split files and name them by the date they were generated when used with `LOGROTATE_DATEFORMAT`. By setting `LOGROTATE_DATEFORMAT` you will enable the Logrotate `dateext` option.

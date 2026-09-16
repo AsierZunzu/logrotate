@@ -22,6 +22,12 @@ ${logrotate_olddir}
 EOF
 }
 
+# Entries only get su when running as root (see createLogrotateConfigurationEntry).
+logrotate_running_as_root=false
+if [ "$(id -u)" = "0" ]; then
+  logrotate_running_as_root=true
+fi
+
 # Logrotate status file handling
 readonly logrotate_logstatus=${LOGROTATE_STATUSFILE:-"/logrotate-status/logrotate.status"}
 

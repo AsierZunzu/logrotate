@@ -23,12 +23,15 @@ function createLogrotateConfigurationEntry() {
   file=${file//\\/\\\\}
   file=${file//\"/\\\"}
   new_log="\"${file}\" {"
-  if [ "$file_user" != "UNKNOWN" ] && [ "$file_owner" != "UNKNOWN" ]; then
-    new_log+="${nl}  su ${file_user} ${file_owner}"
-  else
-    # logrotate only accepts names in su, and without it skips logs whose
-    # directory is group or world writable.
-    new_log+="${nl}  su root root"
+  # su needs root; without root, logrotate runs as the container user.
+  if [ "${logrotate_running_as_root}" = "true" ]; then
+    if [ "$file_user" != "UNKNOWN" ] && [ "$file_owner" != "UNKNOWN" ]; then
+      new_log+="${nl}  su ${file_user} ${file_owner}"
+    else
+      # logrotate only accepts names in su, and without it skips logs whose
+      # directory is group or world writable.
+      new_log+="${nl}  su root root"
+    fi
   fi
   new_log+="${nl}  rotate ${conf_copies}"
   new_log+="${nl}  missingok"

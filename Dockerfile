@@ -5,17 +5,10 @@ LABEL org.opencontainers.image.title="logrotate" \
       org.opencontainers.image.source="https://github.com/AsierZunzu/logrotate" \
       org.opencontainers.image.licenses="MIT"
 
-# logrotate version (e.g. 3.9.1-r0)
+# logrotate package version (e.g. 3.22.0-r0)
 ARG LOGROTATE_VERSION=latest
-# permissions
-ARG CONTAINER_UID=1000
-ARG CONTAINER_GID=1000
 
-# install dev tools
-RUN addgroup -g $CONTAINER_GID logrotate && \
-    adduser -u $CONTAINER_UID -G logrotate -h /usr/bin/logrotate.d -s /bin/bash -S logrotate && \
-    apk add --no-cache \
-      tar \
+RUN apk add --no-cache \
       gzip \
       tzdata \
       bash \
@@ -25,7 +18,8 @@ RUN addgroup -g $CONTAINER_GID logrotate && \
       then apk add --no-cache logrotate ; \
       else apk add --no-cache "logrotate=${LOGROTATE_VERSION}" ; \
     fi && \
-    mkdir -p /usr/bin/logrotate.d
+    mkdir -p /logrotate-status && \
+    chmod 1777 /logrotate-status
 
 # environment variable for this container
 ENV LOGROTATE_OLDDIR= \
