@@ -254,6 +254,12 @@ $ docker run -d \
 
 > This will logrotate on the cron schedule \* \* \* \* \* \* (every second).
 
+Schedules are run by [supercronic](https://github.com/aptible/supercronic):
+
+* Six fields are read as `second minute hour day-of-month month day-of-week`, e.g. the default `1 0 0 * * *` runs daily at 00:00:01.
+* Seven fields add a trailing `year` field and are used as-is.
+* Descriptors such as `@hourly` or `@daily` are also accepted.
+
 ## Delay the Start
 
 The log directories are crawled once when the container starts. If the containers writing the
