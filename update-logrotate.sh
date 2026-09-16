@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# A helper script for updating the /usr/bin/logrotate.d/logrotate.conf.
+# A helper script for updating the generated logrotate.conf.
 
 set -e
 

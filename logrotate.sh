@@ -2,16 +2,18 @@
 #
 # Helper functions for configuration and running logrotate.
 
+# Generated files live outside the image's program directory, so the root
+# filesystem can be mounted read-only with a tmpfs on /tmp.
+readonly logrotate_generated_dir="/tmp/logrotate"
+readonly logrotate_conf_file="${logrotate_generated_dir}/logrotate.conf"
+readonly logrotate_crontab_file="${logrotate_generated_dir}/crontab"
+
 # Resetting the default configuration file for
 # repeated starts.
 function resetConfigurationFile() {
-  if [ -f "/usr/bin/logrotate.d/logrotate.conf" ]; then
-    rm -f /usr/bin/logrotate.d/logrotate.conf
-  else
-    touch /usr/bin/logrotate.d/logrotate.conf
-  fi
+  mkdir -p "${logrotate_generated_dir}"
 
-  cat >> /usr/bin/logrotate.d/logrotate.conf <<EOF
+  cat > "${logrotate_conf_file}" <<EOF
 # deactivate mail
 nomail
 

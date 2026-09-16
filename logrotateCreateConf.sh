@@ -44,8 +44,8 @@ function handleSingleFile() {
   file_owner_user=$(stat -c %U "${singleFile}") || return 0
   file_owner_group=$(stat -c %G "${singleFile}") || return 0
   new_logrotate_entry=$(createLogrotateConfigurationEntry "${singleFile}" "${file_owner_user}" "${file_owner_group}" "${logrotate_copies}" "${logrotate_logfile_compression}" "${logrotate_logfile_compression_delay}" "${logrotate_mode}" "${logrotate_interval}" "${logrotate_size}" "${logrotate_dateformat}" "${logrotate_minsize}" "${logrotate_maxage}" "${logrotate_prerotate}" "${logrotate_postrotate}")
-  echo "Inserting new ${singleFile} to /usr/bin/logrotate.d/logrotate.conf"
-  insertConfigurationEntry "$new_logrotate_entry" "/usr/bin/logrotate.d/logrotate.conf"
+  echo "Inserting new ${singleFile} to ${logrotate_conf_file}"
+  insertConfigurationEntry "$new_logrotate_entry" "${logrotate_conf_file}"
 }
 
 # ----- Logfile Crawling ------
@@ -117,4 +117,4 @@ do
   done < <(find "${d}" "${find_prune[@]}" -type f -print0)
 done
 
-cat /usr/bin/logrotate.d/logrotate.conf
+cat "${logrotate_conf_file}"

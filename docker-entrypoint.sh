@@ -18,7 +18,7 @@ fi
 #Create Logrotate Conf
 source /usr/bin/logrotate.d/logrotateCreateConf.sh
 
-cat /usr/bin/logrotate.d/logrotate.conf
+cat "${logrotate_conf_file}"
 
 # ----- Crontab Generation ------
 
@@ -62,8 +62,8 @@ if [ "$1" = 'cron' ]; then
     logrotate_croninterval="${logrotate_croninterval} *"
   fi
 
-  echo "${logrotate_croninterval} /usr/bin/logrotate.d/run-logrotate.sh" > /usr/bin/logrotate.d/crontab
-  exec /usr/bin/supercronic /usr/bin/logrotate.d/crontab
+  echo "${logrotate_croninterval} /usr/bin/logrotate.d/run-logrotate.sh" > "${logrotate_crontab_file}"
+  exec /usr/bin/supercronic "${logrotate_crontab_file}"
 fi
 
 #-----------------------

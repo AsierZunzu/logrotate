@@ -19,7 +19,7 @@ logrotate_args=()
 if [ -n "${LOGROTATE_PARAMETERS}" ]; then
   logrotate_args+=("-${LOGROTATE_PARAMETERS}")
 fi
-logrotate_args+=("--state=${logrotate_logstatus}" /usr/bin/logrotate.d/logrotate.conf)
+logrotate_args+=("--state=${logrotate_logstatus}" "${logrotate_conf_file}")
 
 if [ -n "${SYSLOGGER}" ]; then
   /usr/sbin/logrotate "${logrotate_args[@]}" 2>&1 | logger "${syslogger_args[@]}"
