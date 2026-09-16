@@ -2,9 +2,18 @@
 #
 # Creation of Logfile
 
+# Resolved paths already written to the configuration. logrotate rejects the whole
+# run when a file appears twice, which happens with nested or repeated directories.
+declare -A configured_files=()
+
 function handleSingleFile() {
   local singleFile="$1"
-  local file_owner_user file_owner_group new_logrotate_entry
+  local file_owner_user file_owner_group new_logrotate_entry resolved_file
+  resolved_file=$(realpath "${singleFile}") || return 0
+  if [ -n "${configured_files[${resolved_file}]}" ]; then
+    return 0
+  fi
+  configured_files[${resolved_file}]=1
   # Skip files that disappear between discovery and stat instead of aborting under set -e.
   file_owner_user=$(stat -c %U "${singleFile}") || return 0
   file_owner_group=$(stat -c %G "${singleFile}") || return 0
