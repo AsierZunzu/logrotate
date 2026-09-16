@@ -108,7 +108,7 @@ Logrotate can rotate logfile according to the following intervals:
 * `monthly`
 * `yearly`
 
-You can override the default setting with the environment variable `LOGROTATE_INTERVAL`.
+The default interval is `daily`. You can override it with the environment variable `LOGROTATE_INTERVAL`.
 
 Example:
 

@@ -64,7 +64,7 @@ function resolveLogfileCompression() {
   fi
 }
 
-logrotate_interval=${LOGROTATE_INTERVAL:-""}
+logrotate_interval=${LOGROTATE_INTERVAL:-"daily"}
 
 logrotate_copies=${LOGROTATE_COPIES:-"5"}
 
