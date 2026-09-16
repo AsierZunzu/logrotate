@@ -12,7 +12,7 @@ source /usr/bin/logrotate.d/logrotateConf.sh
 resetConfigurationFile
 
 if [ -n "${DELAYED_START}" ]; then
-  sleep ${DELAYED_START}
+  sleep "${DELAYED_START}"
 fi
 
 #Create Logrotate Conf
@@ -81,7 +81,7 @@ if [ "$1" = 'cron' ]; then
   fi
 
   logrotate_cron_command="${logrotate_cron_timetable}"
-  if [ ${logrotate_autoupdate} = "true" ]; then
+  if [ "${logrotate_autoupdate}" = "true" ]; then
     logrotate_cron_command="/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
   fi
 

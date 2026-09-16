@@ -67,7 +67,7 @@ function insertConfigurationEntry()
   local config=$1
   local config_file=$2
 
-  cat >> $config_file <<_EOF_
+  cat >> "$config_file" <<_EOF_
 ${config}
 _EOF_
 }
