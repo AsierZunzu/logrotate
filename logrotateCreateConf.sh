@@ -22,38 +22,34 @@ else
 fi
 
 logs_ending="log"
-LOGS_FILE_ENDINGS_INSTRUCTION=""
 
 if [ -n "${LOG_FILE_ENDINGS}" ]; then
   logs_ending=${LOG_FILE_ENDINGS}
 fi
 
-SAVEIFS=$IFS
-IFS=' '
-COUNTER=0
-for ending in $logs_ending
+# Keep find arguments in an array so patterns like *.log reach find as-is
+# instead of being expanded by the shell against the current directory.
+find_name_args=()
+read -ra endings <<< "${logs_ending}"
+for ending in "${endings[@]}"
 do
-  if [ "$COUNTER" -eq "0" ]; then
-    LOGS_FILE_ENDINGS_INSTRUCTION="$LOGS_FILE_ENDINGS_INSTRUCTION -iname "*.${ending}""
-  else
-    LOGS_FILE_ENDINGS_INSTRUCTION="$LOGS_FILE_ENDINGS_INSTRUCTION -o -iname "*.${ending}""
+  if [ ${#find_name_args[@]} -gt 0 ]; then
+    find_name_args+=(-o)
   fi
-  let COUNTER=COUNTER+1
+  find_name_args+=(-iname "*.${ending}")
 done
-IFS=$SAVEIFS
 
 # Check if regex search is enabled
 if [ -n "${LOGS_FILE_REGEX}" ]; then
-  if [ "$COUNTER" -eq "0" ]; then
-    LOGS_FILE_ENDINGS_INSTRUCTION="-regex $LOGS_FILE_REGEX"
-  else
-    LOGS_FILE_ENDINGS_INSTRUCTION="$LOGS_FILE_ENDINGS_INSTRUCTION -o -regex $LOGS_FILE_REGEX"
+  if [ ${#find_name_args[@]} -gt 0 ]; then
+    find_name_args+=(-o)
   fi
+  find_name_args+=(-regex "${LOGS_FILE_REGEX}")
 fi
 
 for d in ${log_dirs}
 do
-  log_files=$(find ${d} -type f $LOGS_FILE_ENDINGS_INSTRUCTION) || continue
+  log_files=$(find ${d} -type f "${find_name_args[@]}") || continue
   for f in ${log_files};
   do
     if [ -f "${f}" ]; then
