@@ -64,8 +64,8 @@ $ docker run -d \
 
 ## Customize Log File Ending
 
-You can define the file endings fluentd will attach to. The container will by default crawl for
-files ending with **.log**. This can be overriden and extended to any amount of file endings.
+You can define the file endings the container will attach to. The container will by default crawl for
+files ending with **.log**. This can be overridden and extended to any amount of file endings.
 
 Example:
 
@@ -143,7 +143,7 @@ $ docker run -d \
 
 ## Set Maximum File size
 
-Logrotate can do additional rotates, when the logfile exceeds a certain file size. You can specifiy file size rotation
+Logrotate can do additional rotates, when the logfile exceeds a certain file size. You can specify file size rotation
 with the environment variable `LOGROTATE_SIZE`.
 
 Valid example values:
@@ -211,7 +211,7 @@ $ docker run -d \
   -v /var/lib/docker/containers:/var/lib/docker/containers \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
-  -e "LOGROTATE_MODE=create 0644"
+  -e "LOGROTATE_MODE=create 0644" \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
@@ -220,7 +220,7 @@ $ docker run -d \
 ## Set the Output directory
 
 By default, logrotate will rotate logs in their respective directories. You can
-specify a directory for keeping old logfiles with the environment variable `LOGROTATE_OLDDIR`. You can specify a full or relative path.
+specify a directory for keeping old logfiles with the environment variable `LOGROTATE_OLDDIR`. You can specify a full path, or a path relative to the directory of each log file.
 
 Example:
 
@@ -239,7 +239,7 @@ $ docker run -d \
 ## Set the Cron Schedule
 
 You can set the cron schedule independently of the logrotate interval. You can override
-the default schedule with the enviroment variable `LOGROTATE_CRONSCHEDULE`.
+the default schedule with the environment variable `LOGROTATE_CRONSCHEDULE`.
 
 Example:
 
@@ -248,11 +248,11 @@ $ docker run -d \
   -v /var/lib/docker/containers:/var/lib/docker/containers \
   -v /var/log/docker:/var/log/docker \
   -e "LOGS_DIRECTORIES=/var/lib/docker/containers /var/log/docker" \
-  -e "LOGROTATE_CRONSCHEDULE=* * * * * *" \
+  -e "LOGROTATE_CRONSCHEDULE=0 */15 * * * *" \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
-> This will logrotate on the cron schedule \* \* \* \* \* \* (every second).
+> This will run logrotate every 15 minutes. Files are still only rotated once their interval or size is reached.
 
 Schedules are run by [supercronic](https://github.com/aptible/supercronic):
 
@@ -296,7 +296,7 @@ $ docker run -d \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
-> You will be able to see logrotate output every minute in file logs/logrotatecron.log.
+> You will be able to see the logrotate output of every hourly run in file logs/logrotatecron.log.
 
 ## Send the Logrotate Output to Syslog
 
@@ -343,7 +343,7 @@ $ docker run -d \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
-> Will run logrotate with: /usr/bin/logrotate -dvf
+> Will run logrotate with: /usr/sbin/logrotate -vdf
 
 ## Logrotate Status File
 
@@ -396,11 +396,11 @@ Maxage and minsize for logs can be configured with the environment variables `LO
 * Maxage: `Remove  rotated  logs  older  than <count> days. The age is only checked if the logfile is to be rotated.`
 * Minsize: `Log files are rotated when they grow bigger than size bytes, but not before the  additionally  specified  time  interval  (daily, weekly, monthly, or yearly).  The related size option is similar except that it is mutually  exclusive  with  the  time  interval options,  and  it  causes log files to be rotated without regard for the last rotation time.  When minsize is used, both the size and timestamp of a log file are considered.`
 
-> [Source](http://manpages.ubuntu.com/manpages/yakkety/man8/logrotate.8.html)
+> [Source](https://man7.org/linux/man-pages/man8/logrotate.8.html)
 
 Size Parameter: `If size is followed by k, the size is assumed to  be  in  kilo-bytes.  If the M is used, the size is in megabytes, and if G is used, the size is in gigabytes. So size 100,  size  100k,  size 100M and size 100G are all valid.`
 
-> [Source](http://manpages.ubuntu.com/manpages/yakkety/man8/logrotate.8.html)
+> [Source](https://man7.org/linux/man-pages/man8/logrotate.8.html)
 
 Example:
 
@@ -433,7 +433,7 @@ $ docker run -d \
   ghcr.io/asierzunzu/logrotate
 ~~~~
 
-> Will print messages before and after rotation.
+> Runs /usr/bin/yourscript.sh before rotating each file and sends a HUP signal to httpd afterwards. The commands run inside this container, so they can only reach processes and scripts visible to it.
 
 ## Disable Auto Update
 
@@ -454,7 +454,7 @@ $ docker run -d \
 
 > This will disable logrotate configuration file update (when logrotate action is triggering).
 
-# Set Time Zone
+## Set Time Zone
 
 With Logrotate by default it logrotate logs in `UTC` time zone. It is possible to set time zone when used with `TZ`. By setting `TZ` (to a valid time zone) it will logrotate logs in the specified time zone.
 
@@ -486,6 +486,6 @@ daemonset "logrotate" created
 
 ## References
 
-* [Logrotate](http://www.linuxcommand.org/man_pages/logrotate8.html)
+* [Logrotate](https://github.com/logrotate/logrotate)
 * [Docker Homepage](https://www.docker.com/)
-* [Docker Userguide](https://docs.docker.com/userguide/)
+* [Supercronic](https://github.com/aptible/supercronic)
