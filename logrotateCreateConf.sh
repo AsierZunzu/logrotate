@@ -5,6 +5,7 @@
 # Resolved paths already written to the configuration. logrotate rejects the whole
 # run when a file appears twice, which happens with nested or repeated directories.
 declare -A configured_files=()
+configured_count=0
 
 # Suffixes logrotate appends to rotated copies: a counter (.1) or a date
 # extension (-20260916, .2026-09-16), optionally followed by a compression extension.
@@ -44,8 +45,11 @@ function handleSingleFile() {
   file_owner_user=$(stat -c %U "${singleFile}") || return 0
   file_owner_group=$(stat -c %G "${singleFile}") || return 0
   new_logrotate_entry=$(createLogrotateConfigurationEntry "${singleFile}" "${file_owner_user}" "${file_owner_group}" "${logrotate_copies}" "${logrotate_logfile_compression}" "${logrotate_logfile_compression_delay}" "${logrotate_mode}" "${logrotate_interval}" "${logrotate_size}" "${logrotate_dateformat}" "${logrotate_minsize}" "${logrotate_maxage}" "${logrotate_prerotate}" "${logrotate_postrotate}")
-  echo "Inserting new ${singleFile} to ${logrotate_conf_file}"
+  if [ "${logrotate_list_files}" != "false" ]; then
+    echo "Adding ${singleFile}"
+  fi
   insertConfigurationEntry "$new_logrotate_entry" "${logrotate_conf_file}"
+  configured_count=$((configured_count + 1))
 }
 
 # ----- Logfile Crawling ------
@@ -95,7 +99,6 @@ for d in ${log_dirs}
 do
   while IFS= read -r -d '' f
   do
-    echo "Found new file $f, Processing..."
     handleSingleFile "$f"
   done < <(find "${d}" "${find_prune[@]}" -type f "${find_filter[@]}" -print0)
 done
@@ -112,9 +115,8 @@ for d in ${all_log_dirs}
 do
   while IFS= read -r -d '' f
   do
-    echo "Found new file $f, Processing..."
     handleSingleFile "$f"
   done < <(find "${d}" "${find_prune[@]}" -type f -print0)
 done
 
-cat "${logrotate_conf_file}"
+echo "Configured ${configured_count} log files in ${logrotate_conf_file}"
