@@ -80,6 +80,24 @@ $ docker run -d \
 
 > Crawls for file endings .json and .xml.
 
+## Match Log Files with a Regex
+
+In addition to the file endings, you can match log files with a regular expression using the
+environment variable `LOGS_FILE_REGEX`. The expression is passed to `find -regex`, so it must match
+the **full path** of the file. Files matching either a file ending or the regex are rotated.
+
+Example:
+
+~~~~
+$ docker run -d \
+  -v /var/log/myapp:/var/log/myapp \
+  -e "LOGS_DIRECTORIES=/var/log/myapp" \
+  -e "LOGS_FILE_REGEX=.*/access-[0-9]*\.txt" \
+  ghcr.io/asierzunzu/logrotate
+~~~~
+
+> Rotates files ending with .log and files like /var/log/myapp/access-2026.txt.
+
 ## Set the Log interval
 
 Logrotate can rotate logfile according to the following intervals:
@@ -236,6 +254,24 @@ $ docker run -d \
 
 > This will logrotate on the cron schedule \* \* \* \* \* \* (every second).
 
+## Delay the Start
+
+The log directories are crawled once when the container starts. If the containers writing the
+logs start at the same time, their log files may not exist yet. Use the environment variable
+`DELAYED_START` to wait a number of seconds before the crawl.
+
+Example:
+
+~~~~
+$ docker run -d \
+  -v /var/lib/docker/containers:/var/lib/docker/containers \
+  -e "LOGS_DIRECTORIES=/var/lib/docker/containers" \
+  -e "DELAYED_START=30" \
+  ghcr.io/asierzunzu/logrotate
+~~~~
+
+> Waits 30 seconds before searching for log files.
+
 ## Log and View the Logrotate Output
 
 You can specify a logfile for the periodical logrotate execution. The file
@@ -255,6 +291,29 @@ $ docker run -d \
 ~~~~
 
 > You will be able to see logrotate output every minute in file logs/logrotatecron.log.
+
+## Send the Logrotate Output to Syslog
+
+Instead of a logfile, the logrotate output can be sent to syslog by setting the environment variable
+`SYSLOGGER` to any value. Use `SYSLOGGER_TAG` to tag the messages. `SYSLOGGER` takes precedence over
+`LOGROTATE_LOGFILE`.
+
+The container has no syslog daemon, so mount the host's `/dev/log` socket. Without it the output
+is silently discarded.
+
+Example:
+
+~~~~
+$ docker run -d \
+  -v /var/lib/docker/containers:/var/lib/docker/containers \
+  -v /dev/log:/dev/log \
+  -e "LOGS_DIRECTORIES=/var/lib/docker/containers" \
+  -e "SYSLOGGER=true" \
+  -e "SYSLOGGER_TAG=logrotate" \
+  ghcr.io/asierzunzu/logrotate
+~~~~
+
+> Sends the logrotate output to the host syslog, tagged with logrotate.
 
 ## Logrotate Commandline Parameters
 
