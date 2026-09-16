@@ -85,7 +85,8 @@ if [ "$1" = 'cron' ]; then
     logrotate_cron_command="/usr/bin/logrotate.d/update-logrotate.sh; ${logrotate_cron_timetable}"
   fi
 
-  echo "${logrotate_croninterval} /bin/bash -c \"${logrotate_cron_command}\"" > /usr/bin/logrotate.d/crontab
+  # pipefail keeps logrotate's exit status when its output is piped to tee or logger.
+  echo "${logrotate_croninterval} /bin/bash -o pipefail -c \"${logrotate_cron_command}\"" > /usr/bin/logrotate.d/crontab
   exec /usr/bin/supercronic /usr/bin/logrotate.d/crontab
 fi
 
